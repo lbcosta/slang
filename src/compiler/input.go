@@ -1,7 +1,6 @@
 package compiler
 
 import (
-	"log"
 	"regexp"
 	"strings"
 )
@@ -48,38 +47,36 @@ func lineToInstruction(line string) (Instruction, error) {
 	if matches := reIncr.FindStringSubmatch(lineStr); matches != nil {
 		// matches[1] and matches[2] should be the same variable
 		if matches[1] == matches[2] {
-			instr.Operation = OpAdd
+			instr.Statement = Increment
 			instr.Args = []string{matches[1]} // V
 			return instr, nil
 		}
 	} else if matches := reDecr.FindStringSubmatch(lineStr); matches != nil {
 		// matches[1] and matches[2] should be the same variable
 		if matches[1] == matches[2] {
-			instr.Operation = OpSub
+			instr.Statement = Decrement
 			instr.Args = []string{matches[1]} // V
 			return instr, nil
 		}
 	} else if matches := reIfNotEq.FindStringSubmatch(lineStr); matches != nil {
-		instr.Operation = OpIfNotEq
+		instr.Statement = ConditionalBranch
 		instr.Args = []string{matches[1], matches[2]} // V, L
 		return instr, nil
 	}
 
-	// If no pattern matched, return an empty instruction (could also handle error)
-	return Instruction{}, ErrInvalidInstruction
+	return Instruction{}, ErrInvalidInstruction{}
 }
 
 func getInstructions(lines []string) []Instruction {
 	var instructions []Instruction
-	for _, line := range lines {
+	for lineIdx, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue // Skip empty lines and comments
 		}
 		instr, err := lineToInstruction(line)
 		if err != nil {
-			log.Printf("Error parsing line '%s': %v\n", line, err)
-			panic(err)
+			panic(ErrInvalidInstruction{Line: lineIdx + 1, Details: line})
 		}
 
 		instructions = append(instructions, instr)

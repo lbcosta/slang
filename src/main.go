@@ -34,7 +34,7 @@ func main() {
 	fmt.Printf("Initial State: %+v\n", program.State)
 
 	// print label map
-	fmt.Printf("Label Map: %+v\n", program.LabelMap)
+	fmt.Printf("Label Map: %+v\n", program.Labels)
 
 	// Here you would typically run the program or further process it
 }
