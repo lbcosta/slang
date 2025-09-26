@@ -1,6 +1,7 @@
 package compiler
 
 import (
+	"log"
 	"regexp"
 	"strings"
 )
@@ -23,8 +24,8 @@ import (
 // Every text is always in uppercase and trimmed of spaces.
 // Lines that are empty or start with # are ignored.
 
-// LineToInstruction converts a line of text to an Instruction struct (Label, Operation, Args).
-func LineToInstruction(line string) (Instruction, error) {
+// lineToInstruction converts a line of text to an Instruction struct (Label, Operation, Args).
+func lineToInstruction(line string) (Instruction, error) {
 	var instr Instruction
 	parts := strings.Fields(line)
 
@@ -68,24 +69,21 @@ func LineToInstruction(line string) (Instruction, error) {
 	return Instruction{}, ErrInvalidInstruction
 }
 
-// ParseProgram converts lines of text to a Program struct.
-func ParseProgram(lines []string) Program {
-	var program Program
-	program.State = make(map[string]int)
-
+func getInstructions(lines []string) []Instruction {
+	var instructions []Instruction
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue // Skip empty lines and comments
 		}
-		instr, err := LineToInstruction(line)
+		instr, err := lineToInstruction(line)
 		if err != nil {
-			// Handle error (e.g., log it, return it, etc.)
+			log.Printf("Error parsing line '%s': %v\n", line, err)
 			panic(err)
 		}
 
-		program.Instructions = append(program.Instructions, instr)
+		instructions = append(instructions, instr)
 	}
 
-	return program
+	return instructions
 }

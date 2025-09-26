@@ -20,7 +20,7 @@ func main() {
 		return
 	}
 
-	program := compiler.ParseProgram(lines)
+	program := compiler.New(lines)
 
 	// print program instructions
 	for i, instr := range program.Instructions {
@@ -32,6 +32,9 @@ func main() {
 
 	// print initial state
 	fmt.Printf("Initial State: %+v\n", program.State)
+
+	// print label map
+	fmt.Printf("Label Map: %+v\n", program.LabelMap)
 
 	// Here you would typically run the program or further process it
 }
