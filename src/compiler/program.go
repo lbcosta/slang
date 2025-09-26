@@ -1,5 +1,11 @@
 package compiler
 
+import (
+	"fmt"
+	"log"
+	"sort"
+)
+
 type Program struct {
 	Instructions []Instruction
 	Counter      int
@@ -10,7 +16,6 @@ type Program struct {
 
 func New(lines []string) Program {
 	var program Program
-	program.State = make(map[string]int)
 	program.Instructions = getInstructions(lines)
 	program.newState()
 	program.initLabels()
@@ -51,21 +56,88 @@ func (p *Program) Length() int {
 	return len(p.Instructions)
 }
 
-func (p *Program) GetSnapshotAt(at int) (int, error) {
-	if at < 0 || at >= len(p.Snapshots) {
-		return -1, ErrProgramCounterOutOfBounds{Counter: at, Length: len(p.Snapshots)}
+func (p *Program) PrintStateHeader() {
+	// Collect all variable names in sorted order for consistent column order
+	varNames := make([]string, 0, len(p.State))
+	for varName := range p.State {
+		varNames = append(varNames, varName)
 	}
-	snapshot := p.Snapshots[at]
-	return snapshot.Counter, nil
+	// Sort variable names alphabetically
+	sort.Strings(varNames)
+
+	// Build header format string dynamically
+	header := fmt.Sprintf("%-8s %-20s", "Counter", "Instruction")
+	for _, varName := range varNames {
+		header += fmt.Sprintf(" %-10s", varName)
+	}
+	log.Println(header)
 }
 
-func (p *Program) SaveSnapshot() {
-	snapshot := Snapshot{
-		Counter: p.Counter,
-		State:   make(map[string]int),
+// PrintState prints the current state of the program in a formatted table row.
+func (p *Program) PrintState() {
+	// Collect all variable names in sorted order for consistent column order
+	varNames := make([]string, 0, len(p.State))
+	for varName := range p.State {
+		varNames = append(varNames, varName)
 	}
-	for k, v := range p.State {
-		snapshot.State[k] = v
+	// Sort variable names alphabetically
+	sort.Strings(varNames)
+
+	// Build state format string dynamically
+	state := fmt.Sprintf("%-8d %-20s", p.Counter, p.Instructions[p.Counter].String())
+	for _, varName := range varNames {
+		state += fmt.Sprintf(" %-10d", p.State[varName])
 	}
-	p.Snapshots = append(p.Snapshots, snapshot)
+	log.Println(state)
+}
+
+func (p *Program) Run() error {
+	// Pretty print a table header
+	p.PrintStateHeader()
+	p.PrintState()
+
+	// 1. Saves a snapshot of the initial state.
+	p.SaveSnapshot()
+
+	// 2. Executes instructions until the counter goes out of bounds.
+	for p.Counter < len(p.Instructions)-1 {
+		instr := p.Instructions[p.Counter]
+		switch instr.Statement {
+		case Increment:
+			varName := instr.Args[0]
+			p.State[varName]++
+			p.Counter++
+		case Decrement:
+			varName := instr.Args[0]
+			if p.State[varName] > 0 {
+				p.State[varName]--
+			}
+			p.Counter++
+		case ConditionalBranch:
+			varName := instr.Args[0]
+			label := instr.Args[1]
+			if p.State[varName] != 0 {
+				if target, exists := p.Labels[label]; exists {
+					p.Counter = target
+				} else {
+					// if label does not exist, halts program without error and explains why
+					log.Printf("Label '%s' not found. Halting program.\n", label)
+					return nil
+				}
+			} else {
+				p.Counter++
+			}
+		default:
+			return ErrInvalidInstruction{
+				Details: fmt.Sprintf("unknown statement type: %v", instr.Statement),
+				Line:    p.Counter + 1,
+			}
+		}
+
+		// 3. Saves a snapshot of the current state.
+		p.SaveSnapshot()
+		// 4. Pretty prints the current state of the program.
+		p.PrintState()
+	}
+	return nil
 }

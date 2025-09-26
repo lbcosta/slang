@@ -22,19 +22,7 @@ func main() {
 
 	program := compiler.New(lines)
 
-	// print program instructions
-	for i, instr := range program.Instructions {
-		fmt.Printf("%d: %+v\n", i, instr)
+	if err := program.Run(); err != nil {
+		fmt.Printf("Error running program: %v\n", err)
 	}
-
-	// print counter
-	fmt.Printf("Counter: %d\n", program.Counter)
-
-	// print initial state
-	fmt.Printf("Initial State: %+v\n", program.State)
-
-	// print label map
-	fmt.Printf("Label Map: %+v\n", program.Labels)
-
-	// Here you would typically run the program or further process it
 }
