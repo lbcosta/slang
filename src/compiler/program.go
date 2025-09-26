@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"fmt"
-	"log"
 	"sort"
 )
 
@@ -124,7 +123,7 @@ func (p *Program) Run() error {
 					p.Counter = target
 				} else {
 					// if label does not exist, halts program without error and explains why
-					log.Printf("Label '%s' not found. Halting program.\n", label)
+					fmt.Printf("\nLabel '%s' not found. Halting program.\n", label)
 					return nil
 				}
 			} else {
