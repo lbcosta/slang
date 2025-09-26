@@ -14,10 +14,10 @@ type Program struct {
 	Snapshots    []Snapshot
 }
 
-func New(lines []string) Program {
+func New(lines []string, initialState map[string]int) Program {
 	var program Program
 	program.Instructions = getInstructions(lines)
-	program.newState()
+	program.newState(initialState)
 	program.initLabels()
 	program.Counter = 0
 
@@ -26,7 +26,7 @@ func New(lines []string) Program {
 
 // newState reads all the instructions and initializes the state map with all variables set to 0.
 // It assumes that the first argument of each instruction is always a variable.
-func (p *Program) newState() {
+func (p *Program) newState(initialState map[string]int) {
 	p.State = make(map[string]int)
 	p.State["Y"] = 0 // Ensure "Y" is always initialized
 
@@ -39,6 +39,10 @@ func (p *Program) newState() {
 			}
 		}
 		// For OpIfNotEq, the second arg is a label, so we don't initialize it.
+	}
+
+	for varName, value := range initialState {
+		p.State[varName] = value
 	}
 }
 
