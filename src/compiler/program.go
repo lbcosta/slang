@@ -13,9 +13,9 @@ type Program struct {
 	Snapshots    []Snapshot
 }
 
-func New(lines []string, initialState map[string]int) Program {
+func Build(instructions []Instruction, initialState map[string]int) Program {
 	var program Program
-	program.Instructions = getInstructions(lines)
+	program.Instructions = instructions
 	program.newState(initialState)
 	program.initLabels()
 	program.Counter = 0
@@ -58,6 +58,7 @@ func (p *Program) initLabels() {
 func (p *Program) Length() int {
 	return len(p.Instructions)
 }
+
 func (p *Program) PrintStateHeader() {
 	// Collect all variable names in sorted order for consistent column order
 	varNames := make([]string, 0, len(p.State))
@@ -147,7 +148,6 @@ func (p *Program) Run() error {
 	return nil
 }
 
-// Prints Y as the result of the program
-func (p *Program) PrintResult() {
-	fmt.Printf("\nResult: Y = %d\n", p.State["Y"])
+func (s *Program) Output() int {
+	return s.State["Y"]
 }

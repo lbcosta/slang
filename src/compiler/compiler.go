@@ -67,9 +67,9 @@ func lineToInstruction(line string) (Instruction, error) {
 	return Instruction{}, ErrInvalidInstruction{}
 }
 
-func getInstructions(lines []string) []Instruction {
+func Compile(programLines []string) []Instruction {
 	var instructions []Instruction
-	for lineIdx, line := range lines {
+	for lineIdx, line := range programLines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue // Skip empty lines and comments
