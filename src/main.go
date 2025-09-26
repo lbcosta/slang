@@ -58,4 +58,6 @@ func main() {
 	if err := program.Run(); err != nil {
 		fmt.Printf("Error running program: %v\n", err)
 	}
+
+	program.PrintResult()
 }

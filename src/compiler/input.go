@@ -82,5 +82,8 @@ func getInstructions(lines []string) []Instruction {
 		instructions = append(instructions, instr)
 	}
 
+	haltInstr := Instruction{Statement: Halt}
+	instructions = append(instructions, haltInstr)
+
 	return instructions
 }

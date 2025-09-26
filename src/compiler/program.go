@@ -59,7 +59,6 @@ func (p *Program) initLabels() {
 func (p *Program) Length() int {
 	return len(p.Instructions)
 }
-
 func (p *Program) PrintStateHeader() {
 	// Collect all variable names in sorted order for consistent column order
 	varNames := make([]string, 0, len(p.State))
@@ -70,11 +69,11 @@ func (p *Program) PrintStateHeader() {
 	sort.Strings(varNames)
 
 	// Build header format string dynamically
-	header := fmt.Sprintf("%-8s %-20s", "Counter", "Instruction")
+	header := fmt.Sprintf("%-8s %-24s", "Counter", "Instruction")
 	for _, varName := range varNames {
 		header += fmt.Sprintf(" %-10s", varName)
 	}
-	log.Println(header)
+	fmt.Println(header)
 }
 
 // PrintState prints the current state of the program in a formatted table row.
@@ -88,11 +87,11 @@ func (p *Program) PrintState() {
 	sort.Strings(varNames)
 
 	// Build state format string dynamically
-	state := fmt.Sprintf("%-8d %-20s", p.Counter, p.Instructions[p.Counter].String())
+	state := fmt.Sprintf("%-8d %-24s", p.Counter, p.Instructions[p.Counter].String())
 	for _, varName := range varNames {
 		state += fmt.Sprintf(" %-10d", p.State[varName])
 	}
-	log.Println(state)
+	fmt.Println(state)
 }
 
 func (p *Program) Run() error {
@@ -104,7 +103,7 @@ func (p *Program) Run() error {
 	p.SaveSnapshot()
 
 	// 2. Executes instructions until the counter goes out of bounds.
-	for p.Counter < len(p.Instructions)-1 {
+	for p.Counter < len(p.Instructions) {
 		instr := p.Instructions[p.Counter]
 		switch instr.Statement {
 		case Increment:
@@ -131,6 +130,9 @@ func (p *Program) Run() error {
 			} else {
 				p.Counter++
 			}
+		case Halt:
+			// Halts the program gracefully
+			return nil
 		default:
 			return ErrInvalidInstruction{
 				Details: fmt.Sprintf("unknown statement type: %v", instr.Statement),
@@ -144,4 +146,9 @@ func (p *Program) Run() error {
 		p.PrintState()
 	}
 	return nil
+}
+
+// Prints Y as the result of the program
+func (p *Program) PrintResult() {
+	fmt.Printf("\nResult: Y = %d\n", p.State["Y"])
 }
