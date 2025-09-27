@@ -83,9 +83,8 @@ func (p *Program) Run() error {
 				if target, exists := p.Labels[label]; exists {
 					p.Counter = target
 				} else {
-					// if label does not exist, halts program without error and explains why
-					fmt.Printf("\nLabel '%s' not found. Halting program.\n", label)
-					return nil
+					// if label does not exist, program should halt
+					p.Counter = p.Length() - 1
 				}
 			} else {
 				p.Counter++
