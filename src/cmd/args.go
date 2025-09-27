@@ -19,9 +19,9 @@ func GetArgs() (programPath string, programArgs map[string]int, err error) {
 		return "", nil, fmt.Errorf("no program path provided")
 	}
 
-	// Read "programPath" and add suffix ".slang" if not present
-	if len(programPath) < 5 || programPath[len(programPath)-5:] != ".slang" {
-		programPath += ".slang"
+	// file needs to end with .slang
+	if !strings.HasSuffix(programPath, ".slang") {
+		return "", nil, fmt.Errorf("program file must have a .slang extension")
 	}
 
 	if len(os.Args) > 2 {
