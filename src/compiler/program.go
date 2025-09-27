@@ -2,7 +2,6 @@ package compiler
 
 import (
 	"fmt"
-	"sort"
 )
 
 type Program struct {
@@ -10,7 +9,7 @@ type Program struct {
 	Counter      int
 	State        map[string]int
 	Labels       map[string]int // maps labels to instruction indices
-	Snapshots    []Snapshot
+	Snapshots    Snapshots
 }
 
 func Build(instructions []Instruction, initialState map[string]int) Program {
@@ -59,48 +58,9 @@ func (p *Program) Length() int {
 	return len(p.Instructions)
 }
 
-func (p *Program) PrintStateHeader() {
-	// Collect all variable names in sorted order for consistent column order
-	varNames := make([]string, 0, len(p.State))
-	for varName := range p.State {
-		varNames = append(varNames, varName)
-	}
-	// Sort variable names alphabetically
-	sort.Strings(varNames)
-
-	// Build header format string dynamically
-	header := fmt.Sprintf("%-8s %-24s", "Counter", "Instruction")
-	for _, varName := range varNames {
-		header += fmt.Sprintf(" %-10s", varName)
-	}
-	fmt.Println(header)
-}
-
-// PrintState prints the current state of the program in a formatted table row.
-func (p *Program) PrintState() {
-	// Collect all variable names in sorted order for consistent column order
-	varNames := make([]string, 0, len(p.State))
-	for varName := range p.State {
-		varNames = append(varNames, varName)
-	}
-	// Sort variable names alphabetically
-	sort.Strings(varNames)
-
-	// Build state format string dynamically
-	state := fmt.Sprintf("%-8d %-24s", p.Counter, p.Instructions[p.Counter].String())
-	for _, varName := range varNames {
-		state += fmt.Sprintf(" %-10d", p.State[varName])
-	}
-	fmt.Println(state)
-}
-
 func (p *Program) Run() error {
-	// Pretty print a table header
-	p.PrintStateHeader()
-	p.PrintState()
-
-	// 1. Saves a snapshot of the initial state.
-	p.SaveSnapshot()
+	p.Snapshots.SaveSnapshot(p)
+	p.Snapshots.PrintLast(true)
 
 	// 2. Executes instructions until the counter goes out of bounds.
 	for p.Counter < len(p.Instructions) {
@@ -140,11 +100,10 @@ func (p *Program) Run() error {
 			}
 		}
 
-		// 3. Saves a snapshot of the current state.
-		p.SaveSnapshot()
-		// 4. Pretty prints the current state of the program.
-		p.PrintState()
+		p.Snapshots.SaveSnapshot(p)
+		p.Snapshots.PrintLast(false)
 	}
+
 	return nil
 }
 
