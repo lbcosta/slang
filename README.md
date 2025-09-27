@@ -17,6 +17,38 @@
 - Instruções podem conter um *label* escrito entre []. Exemplo: `[B] Z <- Z - 1`
 - Se uma instrução for do tipo `IF V != 0 GOTO L` e **L** não existir, o programa para.
 
+
+# Como buildar e executar
+
+## Build (compilar)
+
+Requer Go instalado (versão >= 1.18).
+
+Para compilar o executável na pasta `bin`:
+
+```sh
+make build
+# ou manualmente:
+go build -o bin/slang ./src/main.go
+```
+
+## Executando
+
+Você pode passar argumentos iniciais para variáveis, por exemplo:
+
+```sh
+./bin/slang ./programs/example.slang x=5
+```
+
+## Exemplo de saída
+
+```
+2025/09/26 14:29:32 Counter  Instruction          X          Y         
+2025/09/26 14:29:32 0        X <- X - 1           5          0         
+2025/09/26 14:29:32 1        Y <- Y + 1           4          0         
+2025/09/26 14:29:32 2        IF X != 0 GOTO A     4          1         
+```
+
 # Próximas implementações:
 [] Macros
 
