@@ -12,6 +12,6 @@
 [D] Z <- Z - 1
     X <- X + 1
     Z6 <- Z6 + 1
-    Z99 <-  COPY(X)
+    Z99 <-  COPY(X1, X78, F)
     IF Z6 != 0 GOTO C
 

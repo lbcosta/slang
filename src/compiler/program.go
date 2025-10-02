@@ -10,6 +10,7 @@ type Program struct {
 	State        map[string]int
 	Labels       map[string]int // maps labels to instruction indices
 	Snapshots    Snapshots
+	Macros       map[string]Program // maps macro names to their programs
 }
 
 func Build(instructions []Instruction, initialState map[string]int) Program {
