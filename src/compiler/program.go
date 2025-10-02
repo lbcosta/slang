@@ -92,6 +92,31 @@ func (p *Program) Run() error {
 		case Halt:
 			// Halts the program gracefully
 			return nil
+		case AssignmentMacro:
+			// args[0]: W, args[1]: f, args[2...]: V1, V2, ..., Vn
+			if len(instr.Args) < 3 {
+				return ErrInvalidInstruction{
+					Details: "not enough arguments for AssignmentMacro",
+					Line:    p.Counter + 1,
+				}
+			}
+
+			fmt.Println("Executing AssignmentMacro:", instr)
+			return nil // Placeholder for actual implementation
+		case ConditionalMacro:
+			// args[0]: f, args[1...n-1]: V1, V2, ..., Vn, args[n]: L
+			if len(instr.Args) < 3 {
+				return ErrInvalidInstruction{
+					Details: "not enough arguments for ConditionalMacro",
+					Line:    p.Counter + 1,
+				}
+			}
+			f := instr.Args[0]
+			Vs := instr.Args[1 : len(instr.Args)-1]
+			L := instr.Args[len(instr.Args)-1]
+
+			println("Executing ConditionalMacro:", f, Vs, L)
+			return nil // Placeholder for actual implementation
 		default:
 			return ErrInvalidInstruction{
 				Details: fmt.Sprintf("unknown statement type: %v", instr.Statement),
